@@ -1,0 +1,22 @@
+# The mechanical enforcement of "time, randomness and IDs are injected".
+# These are the Rust analogue of ESLint's no-restricted-syntax: a build failure,
+# not a code-review opinion. Adapters that legitimately need them (infra/src/clock.rs,
+# infra/src/ids.rs) opt out with a narrowly-scoped #[allow] plus a justification.
+
+disallowed-methods = [
+  { path = "chrono::Utc::now", reason = "inject a `dyn Clock`; see app::ports::Clock" },
+  { path = "std::time::SystemTime::now", reason = "inject a `dyn Clock`; see app::ports::Clock" },
+  { path = "uuid::Uuid::new_v4", reason = "inject a `dyn IdGen`; see app::ports::IdGen" },
+  { path = "rand::random", reason = "inject randomness at the edge so tests are deterministic" },
+]
+
+disallowed-types = [
+  { path = "std::collections::HashMap", reason = "use BTreeMap in domain code so iteration order is deterministic and property tests reproduce", replacement = "std::collections::BTreeMap" },
+]
+
+# Keep pedantic honest without drowning the example in noise.
+too-many-arguments-threshold = 8
+
+# Product names that `clippy::doc_markdown` would otherwise demand backticks around.
+# `..` keeps clippy's built-in list rather than replacing it.
+doc-valid-idents = ["SQLite", "PostgreSQL", "UUIDs", "scrypt", ".."]

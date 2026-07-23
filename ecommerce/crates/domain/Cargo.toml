@@ -1,0 +1,25 @@
+[package]
+name = "domain"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+# THE POINT OF THIS FILE: there is no tokio, no sqlx, no axum, no reqwest here.
+# The onion architecture is not a convention in this workspace — it is a compile
+# error to violate it. `cargo tree -p domain` is the audit, and it cannot be faked.
+#
+# chrono is present WITHOUT the "clock" feature: the domain can represent an instant
+# but has no way to ask what time it is. `Utc::now()` does not exist here.
+[dependencies]
+chrono = { version = "0.4", default-features = false, features = ["std", "serde"] }
+nutype = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

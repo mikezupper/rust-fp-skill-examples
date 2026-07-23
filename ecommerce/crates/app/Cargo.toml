@@ -1,0 +1,23 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+# Workflows and the ports they depend on. Note what is absent: sqlx, axum, reqwest.
+# This crate knows there is *a* database, because it defines the `Database` trait —
+# it does not know the database is SQLite, and has no way to find out.
+[dependencies]
+domain = { workspace = true }
+async-trait = { workspace = true }
+chrono = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+proptest = { workspace = true }
+
+[lints]
+workspace = true

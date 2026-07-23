@@ -1,0 +1,74 @@
+[workspace]
+resolver = "3"
+members = ["crates/domain", "crates/app", "crates/infra", "crates/api"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.88"
+license = "CC-BY-4.0"
+
+# Versions pinned once, here. Member crates use `workspace = true`.
+[workspace.dependencies]
+domain = { path = "crates/domain" }
+app = { path = "crates/app" }
+infra = { path = "crates/infra" }
+
+async-trait = "0.1"
+axum = { version = "0.8", features = ["macros"] }
+chrono = { version = "0.4", default-features = false, features = ["std", "clock", "serde"] }
+nutype = { version = "0.7", features = ["serde", "regex"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sqlx = { version = "0.9", default-features = false, features = [
+  "runtime-tokio",
+  "sqlite",
+  "macros",
+  "migrate",
+  "chrono",
+] }
+thiserror = "2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal"] }
+tower = "0.5"
+tower-http = { version = "0.7", features = ["trace", "timeout", "limit", "catch-panic"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+uuid = { version = "1", features = ["v4"] }
+scrypt = "0.11"
+subtle = "2"
+rand = "0.9"
+proptest = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
+
+# ---------------------------------------------------------------------------
+# The hard rules, made mechanical. Every crate opts in with `lints.workspace = true`.
+# Narrow relaxations live in the individual crates, never here.
+# ---------------------------------------------------------------------------
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+unreachable_pub = "warn"
+
+[workspace.lints.clippy]
+# Totality: no hidden panics on the happy path.
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+indexing_slicing = "deny"
+# Exhaustiveness: adding an enum variant must break the build.
+wildcard_enum_match_arm = "deny"
+# Errors are data.
+result_large_err = "allow"
+# General quality tier.
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+must_use_candidate = "allow"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+# NOTE: `panic = "abort"` is deliberately NOT set — CatchPanicLayer converts a defect
+# into a 500 without taking the process down, and that requires unwinding.

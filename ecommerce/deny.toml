@@ -1,0 +1,44 @@
+# cargo-deny: the supply-chain half of the enforcement layer.
+#   cargo deny check
+#
+# `[workspace.lints]` and `clippy.toml` police the code this repository writes.
+# This file polices the code it pulls in.
+
+[advisories]
+yanked = "deny"
+ignore = []
+
+[licenses]
+# Permissive only. A copyleft dependency appearing transitively should be a
+# decision someone makes on purpose, not something discovered at release time.
+allow = [
+  "Apache-2.0",
+  "Apache-2.0 WITH LLVM-exception",
+  "MIT",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "ISC",
+  "Unicode-3.0",
+  "Zlib",
+  "CC0-1.0",
+  "MPL-2.0",
+]
+confidence-threshold = 0.9
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+
+deny = [
+  # Unmaintained or abandoned crates the skill explicitly steers away from.
+  { crate = "im", reason = "unmaintained (bodil/im-rs archived); use imbl" },
+  { crate = "fp-core", reason = "abandoned higher-kinded-type emulation" },
+  { crate = "higher", reason = "abandoned; repository archived" },
+]
+
+skip = []
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

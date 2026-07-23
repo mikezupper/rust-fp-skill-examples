@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  ecommerce:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ecommerce
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ecommerce
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Lint (full deny tier)
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test --workspace
+
+      - name: Supply chain
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: ecommerce/Cargo.toml
+          command: check
+
+      # The architectural claim, asserted rather than documented: the domain crate
+      # must not depend on an async runtime, a database driver, or a web framework.
+      # This step fails the build if someone adds one to crates/domain/Cargo.toml.
+      - name: Assert the domain crate is pure
+        run: |
+          deps=$(cargo tree -p domain --edges normal --prefix none | sort -u)
+          for forbidden in tokio sqlx axum reqwest hyper; do
+            if echo "$deps" | grep -qw "$forbidden"; then
+              echo "::error::domain must not depend on $forbidden"
+              echo "$deps"
+              exit 1
+            fi
+          done
+          echo "domain is a leaf:"
+          cargo tree -p domain --edges normal --depth 1
