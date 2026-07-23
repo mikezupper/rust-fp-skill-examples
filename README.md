@@ -181,7 +181,7 @@ No mocking library appears anywhere. Test doubles are hand-written trait impls (
 
 ## Interop: it serves an existing storefront unmodified
 
-The [Lit SSR storefront](https://github.com/mikezupper/effect-fp-skill-examples/tree/main/ecommerce-ui) from the sibling proof repo — written against a completely different backend, in a different language — runs against this Rust API **with zero changes to the UI**. Point it at this server and the catalog renders, auth works, the cart drawer prices correctly, and the out-of-stock path shows the right message:
+The [Lit SSR storefront](https://github.com/mikezupper/effect-fp-skill-examples/tree/master/ecommerce-ui) from the sibling proof repo — written against a completely different backend, in a different language — runs against this Rust API **with zero changes to the UI**. Point it at this server and the catalog renders, auth works, the cart drawer prices correctly, and the out-of-stock path shows the right message:
 
 ```bash
 # terminal 1
