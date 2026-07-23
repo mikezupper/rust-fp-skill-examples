@@ -9,9 +9,9 @@ license = "CC-BY-4.0"
 
 # Versions pinned once, here. Member crates use `workspace = true`.
 [workspace.dependencies]
-domain = { path = "crates/domain" }
-app = { path = "crates/app" }
-infra = { path = "crates/infra" }
+domain = { path = "crates/domain", version = "0.1.0" }
+app = { path = "crates/app", version = "0.1.0" }
+infra = { path = "crates/infra", version = "0.1.0" }
 
 async-trait = "0.1"
 axum = { version = "0.8", features = ["macros"] }
